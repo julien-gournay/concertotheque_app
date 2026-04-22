@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "983582489419",
+    "project_id": "concertotheque",
+    "storage_bucket": "concertotheque.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:983582489419:android:9bed2591728c13721006ce",
+        "android_client_info": {
+          "package_name": "com.example.concertotheque_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtq3G5WmZyvPZG2I1_rdmJSX9rO_BuLuw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
