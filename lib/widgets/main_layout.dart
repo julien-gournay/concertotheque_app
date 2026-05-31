@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../screens/about_screen.dart';
+import '../screens/artistes_screen.dart';
+import '../screens/concerts_screen.dart';
 import '../screens/dashboard_screen.dart';
+import '../screens/lieux_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/settings_screen.dart';
+import '../services/inbox_service.dart';
 
 class MainLayout extends StatelessWidget {
   final Widget child;
@@ -64,6 +68,10 @@ class MainLayout extends StatelessWidget {
                     "dashboard"),
                 _buildNavItem(context, Icons.mic_external_on_outlined,
                     "Concerts", "concerts"),
+                _buildNavItem(context, Icons.person_outline,
+                    "Artistes", "artistes"),
+                _buildNavItem(context, Icons.place_outlined,
+                    "Lieux", "lieux"),
                 _buildNavItem(
                     context, Icons.settings_outlined, "Paramètres", "settings"),
                 _buildNavItem(context, Icons.info_outline, "À propos", "about"),
@@ -178,6 +186,15 @@ class MainLayout extends StatelessWidget {
       case 'dashboard':
         _replaceWithoutTransition(context, const DashboardScreen());
         break;
+      case 'concerts':
+        _replaceWithoutTransition(context, const ConcertsScreen());
+        break;
+      case 'artistes':
+        _replaceWithoutTransition(context, const ArtistesScreen());
+        break;
+      case 'lieux':
+        _replaceWithoutTransition(context, const LieuxScreen());
+        break;
       case 'about':
         _replaceWithoutTransition(context, const AboutScreen());
         break;
@@ -238,6 +255,7 @@ class MainLayout extends StatelessWidget {
 
     if (shouldLogout != true) return;
 
+    InboxService.stop();
     await FirebaseAuth.instance.signOut();
     if (!context.mounted) return;
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../services/crash_logger.dart';
 import '../widgets/main_layout.dart';
 
 class AboutScreen extends StatefulWidget {
@@ -114,7 +115,7 @@ class _AboutScreenState extends State<AboutScreen> {
                       ),
                     ),
                     subtitle: Text(
-                      'Étudiant développeur - Passionné de musique',
+                      'Étudiant développeur - Passionné de concerts',
                       style: TextStyle(color: Colors.white60),
                     ),
                   ),
@@ -147,18 +148,18 @@ class _AboutScreenState extends State<AboutScreen> {
                               children: [
                                 _buildLinkItem(
                                   context,
-                                  label: 'GitHub',
-                                  url: 'https://github.com',
+                                  label: 'Code source GitHub',
+                                  url: 'https://github.com/julien-gournay/concertotheque_app',
                                 ),
                                 _buildLinkItem(
                                   context,
-                                  label: 'Documentation Flutter',
-                                  url: 'https://docs.flutter.dev',
+                                  label: 'Site web Concertothèque',
+                                  url: 'https://evenement.juliengournay.fr',
                                 ),
                                 _buildLinkItem(
                                   context,
                                   label: 'Signaler un bug',
-                                  url: 'https://github.com/issues',
+                                  url: 'https://github.com/julien-gournay/concertotheque_app/issues',
                                 ),
                               ],
                             ),
@@ -167,6 +168,56 @@ class _AboutScreenState extends State<AboutScreen> {
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 40),
+                _buildSectionTitle('Débogage'),
+                _buildCard(
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Tester le crash logger',
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                            SizedBox(height: 4),
+                            Text('Envoie une erreur de test vers Firestore (Windows) ou Crashlytics (Android).',
+                                style: TextStyle(color: Colors.white54, fontSize: 13)),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final error = Exception('Test crash — Concertothèque Windows');
+                          final stack = StackTrace.current;
+                          final err = await CrashLogger.recordError(error, stack);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(err == null
+                                    ? 'Log envoyé dans Firestore ✓'
+                                    : 'Échec : $err'),
+                                backgroundColor: err == null
+                                    ? const Color(0xFF26C6DA)
+                                    : const Color(0xFFD32F2F),
+                                duration: const Duration(seconds: 6),
+                              ),
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.bug_report_outlined, size: 16),
+                        label: const Text('Envoyer erreur test'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF3A1A1A),
+                          foregroundColor: const Color(0xFFFF6B6B),
+                          side: const BorderSide(color: Color(0xFF7A2A2A)),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 40),
                 Center(

@@ -1,20 +1,43 @@
+import 'dart:async';
+import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart'; // Import du moteur Firebase
-import 'firebase_options.dart'; // Import des clés générées par FlutterFire
+import 'firebase_options.dart';
 import 'app_settings.dart';
 import 'screens/login_screen.dart';
+import 'services/crash_logger.dart';
+import 'services/notification_service.dart';
+import 'services/tray_service.dart';
 
-// On transforme le main en "async" pour pouvoir attendre Firebase
 void main() async {
-  // 1. Indispensable pour lier Flutter aux ressources natives (Windows/Android)
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 2. Initialisation de Firebase avec les options de ton projet
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const ConcertothequeApp());
+  // Crashlytics (Android/iOS) ou Firestore logger (Windows/desktop)
+  CrashLogger.setupFlutterErrorHandler();
+
+  // firebase_messaging ne supporte pas Windows/Linux — mais les notifications
+  // locales (flutter_local_notifications) fonctionnent sur toutes les plateformes
+  if (!Platform.isLinux) {
+    try {
+      await NotificationService.initialize();
+    } catch (e) {
+      debugPrint('NotificationService init error: $e');
+    }
+  }
+
+  if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+    await TrayService.instance.initialize();
+  }
+
+  // Capture les erreurs async hors contexte Flutter
+  await runZonedGuarded(
+    () async => runApp(const ConcertothequeApp()),
+    (error, stack) => CrashLogger.recordError(error, stack, fatal: true),
+  );
 }
 
 class ConcertothequeApp extends StatelessWidget {
@@ -44,7 +67,6 @@ class ConcertothequeApp extends StatelessWidget {
             ),
             scaffoldBackgroundColor: const Color(0xFF12121A),
           ),
-          // Ton écran de connexion s'affichera au démarrage
           home: const LoginScreen(),
         );
       },
