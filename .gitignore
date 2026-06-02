@@ -56,3 +56,7 @@ npm-debug.log
 yarn-error.log
 
 *-firebase-adminsdk-*.json
+
+# Build artifacts — hébergés sur GitHub Releases, pas dans le repo
+installer/*.exe
+installer/*.zip

@@ -73,21 +73,27 @@ class NotificationService {
 
   // ── API publique ─────────────────────────────────────────────────────────
 
-  /// Vérifie si les notifications peuvent être envoyées :
-  ///   1. L'option "Notifications push" doit être activée dans les Paramètres
-  ///   2. L'OS doit avoir accordé la permission à l'application
-  static Future<bool> canShow() async {
-    // Vérification du réglage app (synchrone, rapide)
-    if (!appSettings.pushNotificationsEnabled) return false;
-
-    // Vérification de la permission OS (Android uniquement —
-    // iOS est vérifié à l'init, Windows est géré de façon transparente par l'OS)
+  /// Retourne true si l'OS autorise les notifications pour cette application.
+  /// Sur Windows, le plugin ne fournit pas d'API de vérification — retourne true.
+  static Future<bool> isOsPermissionGranted() async {
     if (Platform.isAndroid) {
       final impl = _local.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
       return await impl?.areNotificationsEnabled() ?? true;
     }
+    return true;
+  }
 
+  /// Vérifie si les notifications peuvent être envoyées :
+  ///   1. L'option "Notifications push" doit être activée dans les Paramètres
+  ///   2. L'OS doit avoir accordé la permission à l'application
+  static Future<bool> canShow() async {
+    if (!appSettings.pushNotificationsEnabled) return false;
+    if (Platform.isAndroid) {
+      final impl = _local.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      return await impl?.areNotificationsEnabled() ?? true;
+    }
     return true;
   }
 

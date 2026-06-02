@@ -36,7 +36,7 @@ class TrayService with TrayListener, WindowListener {
   Future<void> _setupTray() async {
     if (_trayActive) return;
     // setIcon DOIT être appelé avant addListener sur Windows
-    await trayManager.setIcon('windows/runner/resources/app_icon.ico');
+    await trayManager.setIcon('windows/runner/resources/concertotheque.ico');
     await trayManager.setToolTip('Concertothèque');
     await trayManager.setContextMenu(Menu(items: [
       MenuItem(key: 'show', label: 'Ouvrir Concertothèque'),
