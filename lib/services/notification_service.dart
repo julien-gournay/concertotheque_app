@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -17,9 +16,12 @@ class NotificationService {
   static const _windowsGuid = 'B3F7E8A2-1D4C-4F9E-8B6A-7C2D5E0F3A91';
 
   static Future<void> initialize() async {
-    if (Platform.isWindows) {
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
       await _initWindows();
-    } else if (Platform.isAndroid || Platform.isIOS || Platform.isMacOS) {
+    } else if (!kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.android ||
+            defaultTargetPlatform == TargetPlatform.iOS ||
+            defaultTargetPlatform == TargetPlatform.macOS)) {
       await _initMobile();
     }
   }
@@ -76,7 +78,7 @@ class NotificationService {
   /// Retourne true si l'OS autorise les notifications pour cette application.
   /// Sur Windows, le plugin ne fournit pas d'API de vérification — retourne true.
   static Future<bool> isOsPermissionGranted() async {
-    if (Platform.isAndroid) {
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
       final impl = _local.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
       return await impl?.areNotificationsEnabled() ?? true;
@@ -84,12 +86,9 @@ class NotificationService {
     return true;
   }
 
-  /// Vérifie si les notifications peuvent être envoyées :
-  ///   1. L'option "Notifications push" doit être activée dans les Paramètres
-  ///   2. L'OS doit avoir accordé la permission à l'application
   static Future<bool> canShow() async {
     if (!appSettings.pushNotificationsEnabled) return false;
-    if (Platform.isAndroid) {
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
       final impl = _local.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
       return await impl?.areNotificationsEnabled() ?? true;
@@ -97,8 +96,6 @@ class NotificationService {
     return true;
   }
 
-  /// Affiche une notification native (Windows Toast ou Android).
-  /// N'envoie rien si [canShow()] retourne false.
   static Future<void> show({
     required String title,
     required String body,
@@ -106,7 +103,7 @@ class NotificationService {
   }) async {
     if (!await canShow()) return;
 
-    final details = Platform.isWindows
+    final details = (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows)
         ? const NotificationDetails(windows: WindowsNotificationDetails())
         : const NotificationDetails(
             android: AndroidNotificationDetails(
@@ -125,9 +122,8 @@ class NotificationService {
     }
   }
 
-  /// Retourne null sur Windows (FCM non supporté).
   static Future<String?> getToken() async {
-    if (Platform.isWindows) return null;
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) return null;
     return FirebaseMessaging.instance.getToken();
   }
 }

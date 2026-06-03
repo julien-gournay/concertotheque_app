@@ -1,19 +1,19 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'firebase_options.dart';
 import 'app_settings.dart';
 import 'screens/login_screen.dart';
 import 'services/crash_logger.dart';
 import 'services/notification_service.dart';
 import 'services/tray_service.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+      options: DefaultFirebaseOptions.currentPlatform,
   );
 
   // Crashlytics (Android/iOS) ou Firestore logger (Windows/desktop)
@@ -21,7 +21,7 @@ void main() async {
 
   // firebase_messaging ne supporte pas Windows/Linux — mais les notifications
   // locales (flutter_local_notifications) fonctionnent sur toutes les plateformes
-  if (!Platform.isLinux) {
+  if (!kIsWeb && defaultTargetPlatform != TargetPlatform.linux) {
     try {
       await NotificationService.initialize();
     } catch (e) {
@@ -29,7 +29,10 @@ void main() async {
     }
   }
 
-  if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+  if (!kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.windows ||
+          defaultTargetPlatform == TargetPlatform.macOS ||
+          defaultTargetPlatform == TargetPlatform.linux)) {
     await TrayService.instance.initialize();
   }
 

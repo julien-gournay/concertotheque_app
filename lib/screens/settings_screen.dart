@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -36,7 +35,7 @@ class _SettingsScreenState extends State<SettingsScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    if (Platform.isWindows) {
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
       AutostartService.isEnabled().then((v) {
         if (mounted) setState(() => _autostartEnabled = v);
       });
@@ -463,7 +462,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                 ),
 
                 // ── Système (Windows) ─────────────────────────────────────────
-                if (Platform.isWindows) ...[
+                if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) ...[
                   const SizedBox(height: 20),
                   _buildCard(
                     child: Column(
@@ -550,7 +549,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               ? appSettings.setPushNotificationsEnabled
               : null,
         ),
-        if (_osNotifGranted == false && Platform.isWindows)
+        if (_osNotifGranted == false && !kIsWeb && defaultTargetPlatform == TargetPlatform.windows)
           Padding(
             padding: const EdgeInsets.only(left: 4, top: 2),
             child: TextButton.icon(
@@ -571,7 +570,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               ),
             ),
           ),
-        if (_osNotifGranted == false && !Platform.isWindows)
+        if (_osNotifGranted == false && (kIsWeb || defaultTargetPlatform != TargetPlatform.windows))
           const Padding(
             padding: EdgeInsets.only(left: 4, top: 2),
             child: Text(

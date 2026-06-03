@@ -17,6 +17,8 @@ class MainLayout extends StatelessWidget {
   const MainLayout(
       {super.key, required this.child, required this.currentRoute});
 
+  static const double _kMobileBreakpoint = 720;
+
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
@@ -29,111 +31,182 @@ class MainLayout extends StatelessWidget {
     final Color userCardBackground =
         isDark ? const Color(0xFF1E1E2C) : const Color(0xFFEDEFF5);
 
+    final bool isMobile =
+        MediaQuery.of(context).size.width < _kMobileBreakpoint;
+
+    if (isMobile) {
+      return Scaffold(
+        backgroundColor: shellBackground,
+        appBar: AppBar(
+          backgroundColor: sidebarBackground,
+          elevation: 0,
+          iconTheme: IconThemeData(color: primaryText),
+          title: Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF6B35),
+                  borderRadius: BorderRadius.circular(7),
+                ),
+                child: const Icon(Icons.music_note,
+                    color: Colors.white, size: 18),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                "Concertothèque",
+                style: TextStyle(
+                  color: primaryText,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+        drawer: Drawer(
+          backgroundColor: sidebarBackground,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: _buildMenuContent(
+                context,
+                primaryText: primaryText,
+                secondaryText: secondaryText,
+                userCardBackground: userCardBackground,
+              ),
+            ),
+          ),
+        ),
+        body: child,
+      );
+    }
+
+    // Desktop / tablette : sidebar permanente
     return Scaffold(
       backgroundColor: shellBackground,
       body: Row(
         children: [
-          // --- NAVIGATION BAR LATERALE ---
           Container(
             width: 250,
             color: sidebarBackground,
             padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Logo & Titre
-                Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFF6B35),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(Icons.music_note, color: Colors.white),
-                    ),
-                    const SizedBox(width: 12),
-                    Text("Concertothèque",
-                        style: TextStyle(
-                            color: primaryText,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16)),
-                  ],
-                ),
-                const SizedBox(height: 40),
-
-                // Items du menu
-                _buildNavItem(context, Icons.dashboard_outlined, "Dashboard",
-                    "dashboard"),
-                _buildNavItem(context, Icons.mic_external_on_outlined,
-                    "Concerts", "concerts"),
-                _buildNavItem(context, Icons.person_outline,
-                    "Artistes", "artistes"),
-                _buildNavItem(context, Icons.place_outlined,
-                    "Lieux", "lieux"),
-                _buildNavItem(
-                    context, Icons.settings_outlined, "Paramètres", "settings"),
-                _buildNavItem(context, Icons.info_outline, "À propos", "about"),
-
-                const Spacer(),
-
-                // Profil Utilisateur en bas
-                InkWell(
-                  onTap: () => _showUserDialog(context),
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: userCardBackground,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: const Color(0xFFFF6B35),
-                          child: Text(
-                            _initialFromEmail(),
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _currentEmail(),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: primaryText,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                "Appuyer pour se déconnecter",
-                                style: TextStyle(
-                                  color: secondaryText,
-                                  fontSize: 10,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ],
+            child: _buildMenuContent(
+              context,
+              primaryText: primaryText,
+              secondaryText: secondaryText,
+              userCardBackground: userCardBackground,
+              showHeader: true,
             ),
           ),
-
-          // --- CONTENU DE LA PAGE ---
           Expanded(child: child),
         ],
       ),
+    );
+  }
+
+  Widget _buildMenuContent(
+    BuildContext context, {
+    required Color primaryText,
+    required Color secondaryText,
+    required Color userCardBackground,
+    bool showHeader = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (showHeader) ...[
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF6B35),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child:
+                    const Icon(Icons.music_note, color: Colors.white),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                "Concertothèque",
+                style: TextStyle(
+                  color: primaryText,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 40),
+        ],
+
+        _buildNavItem(context, Icons.dashboard_outlined, "Dashboard",
+            "dashboard"),
+        _buildNavItem(context, Icons.mic_external_on_outlined, "Concerts",
+            "concerts"),
+        _buildNavItem(
+            context, Icons.person_outline, "Artistes", "artistes"),
+        _buildNavItem(
+            context, Icons.place_outlined, "Lieux", "lieux"),
+        _buildNavItem(context, Icons.settings_outlined, "Paramètres",
+            "settings"),
+        _buildNavItem(
+            context, Icons.info_outline, "À propos", "about"),
+
+        const Spacer(),
+
+        // Profil Utilisateur en bas
+        InkWell(
+          onTap: () => _showUserDialog(context),
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: userCardBackground,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: const Color(0xFFFF6B35),
+                  child: Text(
+                    _initialFromEmail(),
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _currentEmail(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: primaryText,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "Appuyer pour se déconnecter",
+                        style: TextStyle(
+                          color: secondaryText,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -157,13 +230,15 @@ class MainLayout extends StatelessWidget {
             : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
         border: isActive
-            ? const Border(left: BorderSide(color: Color(0xFFFF6B35), width: 4))
+            ? const Border(
+                left: BorderSide(color: Color(0xFFFF6B35), width: 4))
             : null,
       ),
       child: ListTile(
-        leading:
-            Icon(icon, color: isActive ? const Color(0xFFFF6B35) : Colors.grey),
-        title: Text(label, style: TextStyle(color: labelColor, fontSize: 14)),
+        leading: Icon(icon,
+            color: isActive ? const Color(0xFFFF6B35) : Colors.grey),
+        title:
+            Text(label, style: TextStyle(color: labelColor, fontSize: 14)),
         onTap: () => _navigateTo(context, routeKey),
       ),
     );
@@ -228,11 +303,13 @@ class MainLayout extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(
           'Compte utilisateur',
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+          style:
+              TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
         content: Text(
           _currentEmail(),
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+          style:
+              TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
         actions: [
           TextButton(
