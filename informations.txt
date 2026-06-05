@@ -1,0 +1,21 @@
+----------------------------------------------------
+https://github.com/julien-gournay/concertotheque_app
+----------------------------------------------------
+Concertotheque
+Avec Flutter et Firebase
+
+
+AUTO-EVALUATION :
+-----------------
+→ Authentification : via Firebase (2/2 pts)
+→ CRUD (2/2 pts)
+→ Au moins 8 écrans (2/2 pts)
+→ App élégante et intuitive pour du desktop (2/2 pt)
+→ Réalisation d'une maquette de l'app avec figma (2/2 pts)
+→ Implémentation de 4 fonctionnalités natives à l'OS (2/2 pt)
+→ Utilisation soit du crash reporter firebase ou des logs de supabase (0/1 pts)
+→ Création d’un installeur pour votre plateforme de développement (1/1 pts)
+→ Publication sur un gestionnaire de paquets : scoop (2/2 pts)
+→ Réponse aux 2 questions de l'oral (1/4 pts)
+
+TOTAL : 16/20

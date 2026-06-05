@@ -173,7 +173,7 @@ class _ArtistePickerDialogState extends State<_ArtistePickerDialog> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8)),
           ),
-          onPressed: () => Navigator.pop(context, List.from(_selected)),
+          onPressed: () => Navigator.pop(context, List<String>.from(_selected)),
           child: Text(
             _selected.isEmpty
                 ? 'Confirmer'
